@@ -1,4 +1,4 @@
-package com.ipponusa;
+package com.ipponusa.strings;
 
 import kafka.serializer.StringDecoder;
 import org.apache.spark.SparkConf;
