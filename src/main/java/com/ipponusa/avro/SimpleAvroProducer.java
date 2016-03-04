@@ -1,17 +1,13 @@
 package com.ipponusa.avro;
 
+import com.twitter.bijection.Injection;
+import com.twitter.bijection.avro.GenericAvroCodecs;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.BinaryEncoder;
-import org.apache.avro.io.EncoderFactory;
-import org.apache.commons.io.IOUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Properties;
 
 public class SimpleAvroProducer {
@@ -25,7 +21,7 @@ public class SimpleAvroProducer {
             + "  { \"name\":\"int1\", \"type\":\"int\" }"
             + "]}";
 
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException {
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -33,24 +29,16 @@ public class SimpleAvroProducer {
 
         Schema.Parser parser = new Schema.Parser();
         Schema schema = parser.parse(USER_SCHEMA);
-
-        EncoderFactory avroEncoderFactory = EncoderFactory.get();
-        GenericDatumWriter<GenericRecord> avroWriter = new GenericDatumWriter<>(schema);
-        ByteArrayOutputStream ostream = new ByteArrayOutputStream();
-        BinaryEncoder avroBinaryEncoder = avroEncoderFactory.binaryEncoder(ostream, null);
+        Injection<GenericRecord, byte[]> recordInjection = GenericAvroCodecs.toBinary(schema);
 
         KafkaProducer<String, byte[]> producer = new KafkaProducer<>(props);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 1000; i++) {
             GenericData.Record avroRecord = new GenericData.Record(schema);
             avroRecord.put("str1", "Str 1-" + i);
             avroRecord.put("str2", "Str 2-" + i);
             avroRecord.put("int1", i);
 
-            avroWriter.write(avroRecord, avroBinaryEncoder);
-            avroBinaryEncoder.flush();
-            IOUtils.closeQuietly(ostream);
-            byte[] bytes = ostream.toByteArray();
-            ostream.reset();
+            byte[] bytes = recordInjection.apply(avroRecord);
 
             ProducerRecord<String, byte[]> record = new ProducerRecord<>("mytopic", bytes);
             producer.send(record);
