@@ -17,11 +17,11 @@ object SimpleStringConsumer extends App {
   val topic = "mytopic"
 
   val consumer = new KafkaConsumer[String, String](props)
-  consumer.subscribe(topic)
+  consumer.subscribe(Set(topic).asJava)
 
   while (true) {
-    val records = consumer.poll(100).get(topic)
-    for (record <- records.records().asScala) {
+    val records = consumer.poll(100)
+    for (record <- records.asScala) {
       println(s"key: ${record.key}")
       println(s"value: ${record.value}")
     }

@@ -2,8 +2,10 @@ name := "kafka-sandbox"
 
 scalaVersion := "2.11.7"
 
+resolvers += "confluent" at "http://packages.confluent.io/maven/"
+
 libraryDependencies ++= Seq(
-  "org.apache.kafka" % "kafka-clients" % "0.8.2.1",
-  "org.apache.spark" %% "spark-streaming" % "1.5.2",
-  "org.apache.spark" %% "spark-streaming-kafka" % "1.5.2"
+  //  "org.apache.kafka" % "kafka-clients" % "0.10.0.0",
+  "org.apache.kafka" %% "kafka" % "0.10.0.0-cp1",
+  "io.confluent" % "kafka-avro-serializer" % "3.0.0"
 )
