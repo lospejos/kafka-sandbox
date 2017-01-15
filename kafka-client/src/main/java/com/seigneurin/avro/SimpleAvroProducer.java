@@ -1,4 +1,4 @@
-package com.ipponusa.avro;
+package com.seigneurin.avro;
 
 import com.twitter.bijection.Injection;
 import com.twitter.bijection.avro.GenericAvroCodecs;

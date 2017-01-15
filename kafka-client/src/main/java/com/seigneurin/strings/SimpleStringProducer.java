@@ -1,4 +1,4 @@
-package com.ipponusa.strings;
+package com.seigneurin.strings;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;

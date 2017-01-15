@@ -1,4 +1,4 @@
-package com.ipponusa.strings;
+package com.seigneurin.strings;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
