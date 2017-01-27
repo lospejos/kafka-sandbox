@@ -10,16 +10,16 @@ import org.apache.spark.{SparkConf, SparkContext}
 object SparkReliableStringConsumer {
 
   def main(args: Array[String]) {
-    val topic = "text-input"
+    val topics = Set("text-input-1", "text-input-2")
     val conf = new SparkConf()
       .setAppName("kafka-sandbox")
       .setMaster("local[*]")
     val sc = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(2))
+    val ssc = new StreamingContext(sc, Seconds(10))
 
-    val offsetsStore = new ZooKeeperOffsetsStore("localhost:2181", s"/my-app/offsets/$topic")
+    val offsetsStore = new ZooKeeperOffsetsStore("localhost:2181", s"/my-app/offsets")
     val dstream: InputDStream[(String, String)] = KafkaSource.kafkaStream
-      [String, String, StringDecoder, StringDecoder](ssc, "localhost:9092", offsetsStore, topic)
+      [String, String, StringDecoder, StringDecoder](ssc, "localhost:9092", offsetsStore, topics)
 
     dstream.foreachRDD(messages => messages.foreach(processMessage))
 

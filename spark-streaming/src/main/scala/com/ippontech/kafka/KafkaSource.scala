@@ -14,12 +14,11 @@ object KafkaSource extends LazyLogging {
 
   // Kafka input stream
   def kafkaStream[K: ClassTag, V: ClassTag, KD <: Decoder[K] : ClassTag, VD <: Decoder[V] : ClassTag]
-  (ssc: StreamingContext, brokers: String, offsetsStore: OffsetsStore, topic: String): InputDStream[(K, V)] = {
+  (ssc: StreamingContext, brokers: String, offsetsStore: OffsetsStore, topics: Set[String]): InputDStream[(K, V)] = {
 
-    val topics = Set(topic)
     val kafkaParams = Map("metadata.broker.list" -> brokers)
 
-    val storedOffsets = offsetsStore.readOffsets(topic)
+    val storedOffsets = offsetsStore.readOffsets(topics)
     val kafkaStream = storedOffsets match {
       case None =>
         // start from the latest offsets
@@ -31,7 +30,7 @@ object KafkaSource extends LazyLogging {
     }
 
     // save the offsets
-    kafkaStream.foreachRDD(rdd => offsetsStore.saveOffsets(topic, rdd))
+    kafkaStream.foreachRDD(rdd => offsetsStore.saveOffsets(topics, rdd))
 
     kafkaStream
   }

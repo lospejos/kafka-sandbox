@@ -5,8 +5,8 @@ import org.apache.spark.rdd.RDD
 
 trait OffsetsStore {
 
-  def readOffsets(topic: String): Option[Map[TopicAndPartition, Long]]
+  def readOffsets(topics: Set[String]): Option[Map[TopicAndPartition, Long]]
 
-  def saveOffsets(topic: String, rdd: RDD[_]): Unit
+  def saveOffsets(topics: Set[String], rdd: RDD[_]): Unit
 
 }
