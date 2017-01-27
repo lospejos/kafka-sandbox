@@ -17,7 +17,7 @@ object SparkReliableStringConsumer {
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(10))
 
-    val offsetsStore = new ZooKeeperOffsetsStore("localhost:2181", s"/my-app/offsets")
+    val offsetsStore = new ZooKeeperOffsetsStore("localhost:2181", "/my-app/offsets")
     val dstream: InputDStream[(String, String)] = KafkaSource.kafkaStream
       [String, String, StringDecoder, StringDecoder](ssc, "localhost:9092", offsetsStore, topics)
 
