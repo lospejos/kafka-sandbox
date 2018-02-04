@@ -4,8 +4,7 @@ import java.util.Properties
 
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
-import org.apache.kafka.streams.kstream.KStreamBuilder
+import org.apache.kafka.streams.{Consumed, KafkaStreams, StreamsBuilder, StreamsConfig}
 
 /*
  * Transforms values from 'text-input' to 'text-output':
@@ -29,18 +28,19 @@ object DummyKStream {
     val props = new Properties()
     props.put(StreamsConfig.APPLICATION_ID_CONFIG, "text-transformer")
     props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
-    props.put(StreamsConfig.ZOOKEEPER_CONNECT_CONFIG, "localhost:2181")
     props.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, "8")
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+    props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String.getClass)
+    props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String.getClass)
 
-    val builder = new KStreamBuilder()
+    val builder = new StreamsBuilder()
 
-    builder.stream(Serdes.String(), Serdes.String(), "text-input")
+    builder.stream("text-input", Consumed.`with`(Serdes.String(), Serdes.String()))
       .filter((key, value) => value.contains("a"))
-      .mapValues(text => text.toUpperCase())
-      .to(Serdes.String(), Serdes.String(), "text-output")
+      .mapValues(_.toUpperCase())
+      .to("text-output")
 
-    val streams = new KafkaStreams(builder, props)
+    val streams = new KafkaStreams(builder.build(), props)
     streams.start()
 
   }

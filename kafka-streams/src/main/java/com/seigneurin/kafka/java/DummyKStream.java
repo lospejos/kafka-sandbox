@@ -2,9 +2,11 @@ package com.seigneurin.kafka.java;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.Consumed;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.kstream.KStreamBuilder;
+import org.apache.kafka.streams.kstream.Produced;
 
 import java.util.Properties;
 
@@ -30,18 +32,17 @@ public class DummyKStream {
         Properties props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "text-transformer");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(StreamsConfig.ZOOKEEPER_CONNECT_CONFIG, "localhost:2181");
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 5 * 1000);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        KStreamBuilder builder = new KStreamBuilder();
+        StreamsBuilder builder = new StreamsBuilder();
 
-        builder.stream(Serdes.String(), Serdes.String(), "text-input")
+        builder.stream("text-input", Consumed.with(Serdes.String(), Serdes.String()))
                 .filter((key, value) -> value.contains("a"))
                 .mapValues(text -> text.toUpperCase())
-                .to(Serdes.String(), Serdes.String(), "text-output");
+                .to("text-output", Produced.with(Serdes.String(), Serdes.String()));
 
-        KafkaStreams streams = new KafkaStreams(builder, props);
+        KafkaStreams streams = new KafkaStreams(builder.build(), props);
         streams.start();
 
     }
