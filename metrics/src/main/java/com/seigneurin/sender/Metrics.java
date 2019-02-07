@@ -25,13 +25,13 @@ public class Metrics {
                 .build()
                 .start(5, TimeUnit.SECONDS);
 
-        GraphiteReporter.forRegistry(registry)
-                .prefixedWith("serviceintegrator." + metricsAppId)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .filter(MetricFilter.ALL)
-                .build(new Graphite("localhost", 2003))
-                .start(1, TimeUnit.SECONDS);
+//        GraphiteReporter.forRegistry(registry)
+//                .prefixedWith("serviceintegrator." + metricsAppId)
+//                .convertRatesTo(TimeUnit.SECONDS)
+//                .convertDurationsTo(TimeUnit.MILLISECONDS)
+//                .filter(MetricFilter.ALL)
+//                .build(new Graphite("localhost", 2003))
+//                .start(1, TimeUnit.SECONDS);
 
         KafkaReporter.forRegistry(registry)
                 .prefixedWith("serviceintegrator")

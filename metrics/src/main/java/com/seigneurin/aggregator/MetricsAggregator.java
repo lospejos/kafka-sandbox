@@ -43,7 +43,9 @@ public class MetricsAggregator {
         KTable<String, CounterMetric> metricsStream = builder.table(appIdSerde, metricSerde, rawMetricsTopic, "raw-metrics");
 
         // FIXME
-        metricsStream.foreach((key, value) -> System.out.println("RECEIVED - " + key + " --> " + value));
+        metricsStream.foreach((key, value) ->
+                System.out.println("RECEIVED - " + key + " --> " + value)
+        );
 
         KStream<String, CounterMetric> metricValueStream = metricsStream
                 .groupBy((key, value) -> new KeyValue<>(value.getName(), value), metricNameSerde, metricSerde)
@@ -51,19 +53,21 @@ public class MetricsAggregator {
                 .toStream();
 
         // FIXME
-        metricValueStream.foreach((key, value) -> System.out.println("OUTPUT - " + key + " --> " + value));
+        metricValueStream.foreach((key, value) ->
+                System.out.println("OUTPUT - " + key + " --> " + value)
+        );
 
         metricValueStream.to(metricNameSerde, metricSerde, aggMetricsTopic);
 
         // --- Second topology
-
-        GraphiteReporter graphite = GraphiteReporter.builder()
-                .hostname("localhost")
-                .port(2003)
-                .build();
-
         KStream<String, CounterMetric> aggMetricsStream = builder.stream(metricNameSerde, metricSerde, aggMetricsTopic);
-        aggMetricsStream.foreach((key, metric) -> graphite.send(metric));
+
+//        GraphiteReporter graphite = GraphiteReporter.builder()
+//                .hostname("localhost")
+//                .port(2003)
+//                .build();
+//
+//        aggMetricsStream.foreach((key, metric) -> graphite.send(metric));
 
         // ---
 

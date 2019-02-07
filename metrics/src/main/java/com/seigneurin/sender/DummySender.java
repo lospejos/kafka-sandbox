@@ -17,6 +17,7 @@ public class DummySender {
 
         Random random = new Random(System.currentTimeMillis());
 
+        //for (int i=0; i < 10; i++) {
         while (true) {
             counter.inc(random.nextInt(10) + 1);
             Thread.sleep(250);
